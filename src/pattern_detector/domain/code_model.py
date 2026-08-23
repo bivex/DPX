@@ -164,35 +164,73 @@ class CodeModel:
     """Aggregate Root representing the whole scanned codebase."""
 
     namespaces: dict[str, NamespaceModel] = field(default_factory=dict)
+    _all_functions_cache: list[FunctionModel] | None = field(default=None, init=False, repr=False)
+    _all_protocols_cache: list[ProtocolModel] | None = field(default=None, init=False, repr=False)
+    _all_records_cache: list[RecordModel] | None = field(default=None, init=False, repr=False)
+    _implements_cache: dict[str, list[RecordModel]] | None = field(default=None, init=False, repr=False)
+
+    def _invalidate_caches(self) -> None:
+        self._all_functions_cache = None
+        self._all_protocols_cache = None
+        self._all_records_cache = None
+        self._implements_cache = None
 
     def add_namespace(self, ns: NamespaceModel) -> None:
+        self._invalidate_caches()
         self.namespaces[ns.name] = ns
 
     def get_namespace(self, name: str) -> NamespaceModel | None:
         return self.namespaces.get(name)
 
     def all_functions(self) -> list[FunctionModel]:
+        if self._all_functions_cache is not None:
+            return self._all_functions_cache
+
         res: list[FunctionModel] = []
+        seen: set[tuple[str, str, int]] = set()
         for ns in self.namespaces.values():
-            res.extend(ns.functions.values())
+            for fn in ns.functions.values():
+                key = (fn.name, fn.location.file_path, fn.location.line)
+                if key not in seen:
+                    seen.add(key)
+                    res.append(fn)
             for mm_methods in ns.multimethods.values():
-                res.extend(mm_methods)
+                for fn in mm_methods:
+                    key = (fn.name, fn.location.file_path, fn.location.line)
+                    if key not in seen:
+                        seen.add(key)
+                        res.append(fn)
             for rec in ns.records.values():
-                res.extend(rec.methods)
+                for fn in rec.methods:
+                    key = (fn.name, fn.location.file_path, fn.location.line)
+                    if key not in seen:
+                        seen.add(key)
+                        res.append(fn)
             for ext in ns.extensions:
-                res.extend(ext.methods)
+                for fn in ext.methods:
+                    key = (fn.name, fn.location.file_path, fn.location.line)
+                    if key not in seen:
+                        seen.add(key)
+                        res.append(fn)
+        self._all_functions_cache = res
         return res
 
     def all_protocols(self) -> list[ProtocolModel]:
+        if self._all_protocols_cache is not None:
+            return self._all_protocols_cache
         res: list[ProtocolModel] = []
         for ns in self.namespaces.values():
             res.extend(ns.protocols.values())
+        self._all_protocols_cache = res
         return res
 
     def all_records(self) -> list[RecordModel]:
+        if self._all_records_cache is not None:
+            return self._all_records_cache
         res: list[RecordModel] = []
         for ns in self.namespaces.values():
             res.extend(ns.records.values())
+        self._all_records_cache = res
         return res
 
     def all_extensions(self) -> list[ProtocolExtensionModel]:
@@ -224,7 +262,17 @@ class CodeModel:
         return None
 
     def find_records_implementing(self, protocol_name: str) -> list[RecordModel]:
-        return [rec for rec in self.all_records() if rec.implements_protocol(protocol_name)]
+        if self._implements_cache is None:
+            self._implements_cache = {}
+            for rec in self.all_records():
+                for proto in rec.implemented_protocols:
+                    self._implements_cache.setdefault(proto, []).append(rec)
+                    norm = proto.split("/")[-1]
+                    if norm != proto:
+                        self._implements_cache.setdefault(norm, []).append(rec)
+
+        norm_target = protocol_name.split("/")[-1]
+        return self._implements_cache.get(protocol_name, self._implements_cache.get(norm_target, []))
 
     def find_callers_of(self, fn_name: str) -> list[FunctionModel]:
         norm = fn_name.split("/")[-1]
