@@ -2,6 +2,8 @@
 
 from pattern_detector.domain.rules.adapter_rule import AdapterPatternRule
 from pattern_detector.domain.rules.base import BasePatternRule, PatternRule
+from pattern_detector.domain.rules.chain_of_responsibility_rule import ChainOfResponsibilityRule
+from pattern_detector.domain.rules.circular_dependency_rule import CircularDependencyRule
 from pattern_detector.domain.rules.decorator_rule import DecoratorPatternRule
 from pattern_detector.domain.rules.factory_rule import FactoryPatternRule
 from pattern_detector.domain.rules.lifecycle_rule import LifecycleComponentPatternRule
@@ -20,12 +22,16 @@ def get_default_rules() -> list[PatternRule]:
         FactoryPatternRule(),
         AdapterPatternRule(),
         LifecycleComponentPatternRule(),
+        ChainOfResponsibilityRule(),
+        CircularDependencyRule(),
     ]
 
 
 __all__ = [
     "AdapterPatternRule",
     "BasePatternRule",
+    "ChainOfResponsibilityRule",
+    "CircularDependencyRule",
     "DecoratorPatternRule",
     "FactoryPatternRule",
     "LifecycleComponentPatternRule",

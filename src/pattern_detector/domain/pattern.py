@@ -104,4 +104,12 @@ PATTERN_CATALOG: dict[PatternType, PatternDefinition] = {
         intent="Encapsulate invariant resource or bracket logic (e.g. with-open) with customizable step callbacks.",
         tags=["macros", "callbacks", "brackets"],
     ),
+    PatternType.CIRCULAR_DEPENDENCY: PatternDefinition(
+        type=PatternType.CIRCULAR_DEPENDENCY,
+        name="Circular Dependency / Namespace Cycle",
+        category=PatternCategory.ARCHITECTURAL,
+        description="Identifies mutual recursive dependencies and import cycles between namespaces.",
+        intent="Detect architectural coupling smells and circular cross-namespace invocation loops.",
+        tags=["architecture", "dependencies", "cycles", "coupling"],
+    ),
 }

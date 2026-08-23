@@ -26,11 +26,14 @@ class FileSourceProvider(SourceProviderPort):
                 pass
             return sources
 
-        # Directory recursive search
         for file_path in target.rglob("*"):
             if file_path.is_file() and file_path.suffix in valid_exts:
-                # Skip hidden directories like .git
-                if any(part.startswith(".") for part in file_path.parts):
+                try:
+                    rel_parts = file_path.relative_to(target).parts
+                except ValueError:
+                    rel_parts = file_path.parts
+                # Skip hidden files/directories relative to root target
+                if any(part.startswith(".") and part not in (".", "..") for part in rel_parts):
                     continue
                 try:
                     content = file_path.read_text(encoding="utf-8", errors="replace")

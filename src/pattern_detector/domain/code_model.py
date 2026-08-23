@@ -1,12 +1,13 @@
 """Agnostic Domain Code Model.
 
 Represents structural and semantic constructs (Protocols, Records/Classes,
-Functions, State, Invocations, Namespaces) parsed from source code without
-direct dependency on any AST framework.
+Functions, State, Invocations, Namespaces, Dependency Graphs) parsed from source code
+without direct dependency on any AST framework.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from pattern_detector.domain.value_objects import SourceLocation
@@ -232,3 +233,70 @@ class CodeModel:
             if any(call == fn_name or call.split("/")[-1] == norm for call in fn.calls):
                 callers.append(fn)
         return callers
+
+    # -------------------------------------------------------------------------
+    # Graph & Cross-Namespace Dependency Analysis
+    # -------------------------------------------------------------------------
+
+    def build_namespace_dependency_graph(self) -> dict[str, set[str]]:
+        """Build directed adjacency map of namespace dependencies: source_ns -> {target_ns, ...}."""
+        graph: dict[str, set[str]] = {ns_name: set() for ns_name in self.namespaces}
+        all_ns_names = set(self.namespaces.keys())
+
+        for ns_name, ns in self.namespaces.items():
+            # 1. Inspect explicit requires
+            for req in ns.requires:
+                # Match required namespace names (e.g. "[foo.bar :as b]" or "foo.bar")
+                matches = re.findall(r"[a-zA-Z0-9_\.\-]+", req)
+                if matches:
+                    dep_name = matches[0].strip("[]()")
+                    if dep_name in all_ns_names and dep_name != ns_name:
+                        graph[ns_name].add(dep_name)
+
+            # 2. Inspect qualified function calls
+            for fn in ns.functions.values():
+                for call in fn.calls:
+                    if "/" in call:
+                        prefix = call.split("/")[0]
+                        if prefix in all_ns_names and prefix != ns_name:
+                            graph[ns_name].add(prefix)
+
+        return graph
+
+    def find_circular_dependencies(self) -> list[list[str]]:
+        """Detect all simple circular dependency cycles between namespaces."""
+        graph = self.build_namespace_dependency_graph()
+        cycles: list[list[str]] = []
+        visited: set[str] = set()
+
+        def _dfs(current: str, path: list[str], path_set: set[str]) -> None:
+            path.append(current)
+            path_set.add(current)
+
+            for neighbor in sorted(graph.get(current, set())):
+                if neighbor == path[0] and len(path) >= 2:
+                    # Found cycle back to origin
+                    cycles.append(list(path))
+                elif neighbor not in path_set and neighbor not in visited:
+                    _dfs(neighbor, path, path_set)
+
+            path.pop()
+            path_set.remove(current)
+
+        for node in sorted(graph.keys()):
+            _dfs(node, [], set())
+            visited.add(node)
+
+        # Deduplicate rotationally equivalent cycles
+        unique_cycles: list[list[str]] = []
+        seen_cycle_keys: set[tuple[str, ...]] = set()
+
+        for c in cycles:
+            # Canonical cycle representation by smallest element first
+            min_idx = c.index(min(c))
+            canonical = tuple(c[min_idx:] + c[:min_idx])
+            if canonical not in seen_cycle_keys:
+                seen_cycle_keys.add(canonical)
+                unique_cycles.append(c)
+
+        return unique_cycles

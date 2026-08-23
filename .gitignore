@@ -25,6 +25,8 @@ wheels/
 env/
 venv/
 ENV/
+scratch/
+
 
 # Testing and Type Checking
 .pytest_cache/

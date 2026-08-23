@@ -27,12 +27,16 @@ class ScanningService(ScannerPort, DetectorPort):
         source_provider: SourceProviderPort,
         parser: ParserPort,
         detector_service: PatternDetectorService,
-        result_repository: ResultRepositoryPort | None = None,
+        json_repository: ResultRepositoryPort | None = None,
+        html_repository: ResultRepositoryPort | None = None,
+        markdown_repository: ResultRepositoryPort | None = None,
     ) -> None:
         self._source_provider = source_provider
         self._parser = parser
         self._detector_service = detector_service
-        self._result_repository = result_repository
+        self._json_repository = json_repository
+        self._html_repository = html_repository
+        self._markdown_repository = markdown_repository
 
     def detect(self, model: CodeModel) -> list[Detection]:
         """Directly detect patterns in an already constructed CodeModel."""
@@ -73,8 +77,14 @@ class ScanningService(ScannerPort, DetectorPort):
                 filtered.append(d)
             report.detections = filtered
 
-        # 5. Persist if destination specified
-        if opts.output_json_path and self._result_repository:
-            self._result_repository.save(report, opts.output_json_path)
+        # 5. Persist to outputs if requested
+        if opts.output_json_path and self._json_repository:
+            self._json_repository.save(report, opts.output_json_path)
+
+        if opts.output_html_path and self._html_repository:
+            self._html_repository.save(report, opts.output_html_path)
+
+        if opts.output_markdown_path and self._markdown_repository:
+            self._markdown_repository.save(report, opts.output_markdown_path)
 
         return report

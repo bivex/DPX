@@ -54,6 +54,22 @@ def scan(
             help="Export results to a JSON file destination.",
         ),
     ] = None,
+    html_output: Annotated[
+        str | None,
+        typer.Option(
+            "--html",
+            "-H",
+            help="Export results to an interactive HTML report dashboard.",
+        ),
+    ] = None,
+    markdown_output: Annotated[
+        str | None,
+        typer.Option(
+            "--markdown",
+            "-m",
+            help="Export results to a Markdown report file.",
+        ),
+    ] = None,
     verbose: Annotated[
         bool,
         typer.Option(
@@ -73,6 +89,8 @@ def scan(
         min_confidence=min_confidence,
         enabled_patterns=pattern or [],
         output_json_path=json_output,
+        output_html_path=html_output,
+        output_markdown_path=markdown_output,
         verbose=verbose,
     )
 
@@ -83,7 +101,13 @@ def scan(
     container.report_formatter.render_to_console(report, console, verbose=verbose)  # type: ignore[attr-defined]
 
     if json_output:
-        console.print(f"[bold green]✔[/bold green] Full detection report exported to: [underline]{json_output}[/underline]\n")
+        console.print(f"[bold green]✔[/bold green] Full JSON detection report exported to: [underline]{json_output}[/underline]")
+    if html_output:
+        console.print(f"[bold green]✔[/bold green] Interactive HTML dashboard exported to: [underline]{html_output}[/underline]")
+    if markdown_output:
+        console.print(f"[bold green]✔[/bold green] Markdown report exported to: [underline]{markdown_output}[/underline]")
+    if json_output or html_output or markdown_output:
+        console.print()
 
 
 @app.command(name="rules")

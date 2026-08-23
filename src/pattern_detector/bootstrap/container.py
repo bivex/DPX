@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from pattern_detector.adapters.outbound.antlr import ClojureAntlrParserAdapter
 from pattern_detector.adapters.outbound.filesystem import FileSourceProvider
-from pattern_detector.adapters.outbound.persistence import ConsoleReportFormatter, JsonResultRepository
+from pattern_detector.adapters.outbound.persistence import (
+    ConsoleReportFormatter,
+    HtmlReportFormatter,
+    HtmlResultRepository,
+    JsonResultRepository,
+    MarkdownReportFormatter,
+    MarkdownResultRepository,
+)
 from pattern_detector.application.services.scanning_service import ScanningService
 from pattern_detector.domain.rules import get_default_rules
 from pattern_detector.domain.services.pattern_detector import PatternDetectorService
@@ -28,15 +35,25 @@ class Container:
         self,
         source_provider: SourceProviderPort | None = None,
         parser: ParserPort | None = None,
-        result_repository: ResultRepositoryPort | None = None,
+        json_repository: ResultRepositoryPort | None = None,
+        html_repository: ResultRepositoryPort | None = None,
+        markdown_repository: ResultRepositoryPort | None = None,
         report_formatter: ReportFormatterPort | None = None,
+        html_formatter: ReportFormatterPort | None = None,
+        markdown_formatter: ReportFormatterPort | None = None,
         detector_service: PatternDetectorService | None = None,
     ) -> None:
         # Outbound Driven Adapters
         self.source_provider: SourceProviderPort = source_provider or FileSourceProvider()
         self.parser: ParserPort = parser or ClojureAntlrParserAdapter()
-        self.result_repository: ResultRepositoryPort = result_repository or JsonResultRepository()
+
+        self.html_formatter: ReportFormatterPort = html_formatter or HtmlReportFormatter()
+        self.markdown_formatter: ReportFormatterPort = markdown_formatter or MarkdownReportFormatter()
         self.report_formatter: ReportFormatterPort = report_formatter or ConsoleReportFormatter()
+
+        self.json_repository: ResultRepositoryPort = json_repository or JsonResultRepository()
+        self.html_repository: ResultRepositoryPort = html_repository or HtmlResultRepository(formatter=self.html_formatter)  # type: ignore[arg-type]
+        self.markdown_repository: ResultRepositoryPort = markdown_repository or MarkdownResultRepository(formatter=self.markdown_formatter)  # type: ignore[arg-type]
 
         # Domain Service & Rules
         self.detector_service: PatternDetectorService = detector_service or PatternDetectorService(rules=get_default_rules())
@@ -46,7 +63,9 @@ class Container:
             source_provider=self.source_provider,
             parser=self.parser,
             detector_service=self.detector_service,
-            result_repository=self.result_repository,
+            json_repository=self.json_repository,
+            html_repository=self.html_repository,
+            markdown_repository=self.markdown_repository,
         )
 
     def get_scanner(self) -> ScannerPort:

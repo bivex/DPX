@@ -51,6 +51,7 @@ class PatternType(str, Enum):
     LIFECYCLE_COMPONENT = "lifecycle_component"
     MIDDLEWARE_PIPELINE = "middleware_pipeline"
     MULTIMETHOD_DISPATCH = "multimethod_dispatch"
+    CIRCULAR_DEPENDENCY = "circular_dependency"
 
 
 class ConfidenceLevel(str, Enum):
