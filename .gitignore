@@ -27,15 +27,19 @@ venv/
 ENV/
 scratch/
 
-
 # Testing and Type Checking
 .pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# IDE
+# Temporary directories and clones
+tmp*/
+temp*/
+
+# IDE & OS
 .idea/
 .vscode/
 *.swp
