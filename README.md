@@ -73,17 +73,27 @@
 
 ---
 
-## 📐 Supported Design Patterns
+## 📐 Supported Design Patterns (17 Detection Rules)
 
 | Pattern Type | Category | Detection Strategy & Heuristics |
 |---|---|---|
 | **Observer** | Behavioral | Watched `atom`/`ref`/`agent`, `add-watch` calls, 4-arg watcher callbacks `[k r o n]`. |
 | **Strategy** | Behavioral | `defmulti` dispatch function + `defmethod` branches, or `defprotocol` with 2+ implementing records. |
 | **Decorator** | Structural | Ring-style middleware: functions taking `[handler]` and returning inner closures `(fn [req] ...)`. |
+| **Chain of Responsibility** | Behavioral | Pipeline assembly chaining middleware stages using `->`, `->>`, or `comp`. |
+| **Template Method** | Behavioral | `with-*` macros/functions encapsulating `try/finally` acquire-release bracket safety. |
+| **Command / CQRS** | Behavioral | Multimethod message dispatch on `:type`/`:command`/`:op` and command records. |
+| **State / FSM** | Behavioral | State machine transition functions / multimethods on `[state event]`. |
 | **Singleton** | Creational | `defonce` with mutable reference container (`atom`, `ref`, `agent`) or memoized lazy delay. |
-| **Factory Method** | Creational | Constructor helpers (`make-*`, `create-*`, `build-*`) encapsulating `->Record` or `map->Record`. |
-| **Adapter** | Structural | External protocol extensions (`extend-type`/`extend-protocol`) adapting host/Java types to protocols. |
+| **Factory Method** | Creational | Constructor helpers (`make-*`, `create-*`, `build-*`, `new-*`) encapsulating `->Record` or `map->Record`. |
+| **Abstract Factory** | Creational | Protocols declaring families of object creation interfaces implemented by concrete factories. |
+| **Builder** | Creational | Fluent configuration step functions (`with-*`, `set-*`) modifying accumulator maps/records. |
+| **Adapter** | Structural | External protocol extensions (`extend-type`/`extend-protocol`) adapting host/Java types. |
+| **Facade** | Structural | High-level API/gateway namespaces aggregating and delegating calls to multiple subsystems. |
+| **Proxy** | Structural | Dynamic interop proxies `(proxy [Class] ...)` and deferred access via `delay`/`future`. |
+| **Flyweight** | Structural | Shared immutable instances and result caches via `memoize` or interning. |
 | **Lifecycle Component** | Architectural | Stuart Sierra `Lifecycle` component protocol with `start` and `stop` lifecycle transitions. |
+| **Circular Dependency** | Architectural | Architectural namespace dependency cycle analysis (`A ➔ B ➔ A` loops). |
 
 ---
 
