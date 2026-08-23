@@ -5,9 +5,9 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg?style=flat&logo=python)](https://www.python.org/)
 [![Architecture](https://img.shields.io/badge/Architecture-Hexagonal%20%2B%20DDD-brightgreen.svg?style=flat)]()
 [![ANTLR](https://img.shields.io/badge/Parser-ANTLR%204.13.2-red.svg?style=flat)](https://www.antlr.org/)
-[![Tests](https://img.shields.io/badge/Tests-34%20passed%20(100%25)-success.svg?style=flat)]()
+[![Tests](https://img.shields.io/badge/Tests-49%20passed%20(100%25)-success.svg?style=flat)]()
 [![Code Style](https://img.shields.io/badge/Linter-Ruff%20%26%20Mypy%20Strict-black.svg?style=flat)]()
-[![Patterns](https://img.shields.io/badge/Supported%20Patterns-17%20Rules-orange.svg?style=flat)]()
+[![Patterns](https://img.shields.io/badge/Supported%20Patterns-25%20Rules%20(All%2023%20GoF%20%2B%20Architectural)-orange.svg?style=flat)]()
 
 ---
 
@@ -33,7 +33,7 @@ The system strictly follows **Domain-Driven Design (DDD)** and **Hexagonal Archi
                                       │    DOMAIN CORE    │
                                       │                   │
                                       │  CodeModel        │
-                                      │  17 PatternRules  │
+                                      │  25 PatternRules  │
                                       │  Confidence Model │
                                       │  Evidence Trail   │
                                       │  Dependency Graph │
@@ -88,27 +88,35 @@ The system strictly follows **Domain-Driven Design (DDD)** and **Hexagonal Archi
 
 ---
 
-## 📐 Supported Design Patterns (17 Detection Rules)
+## 📐 Supported Design Patterns (All 23 GoF + 2 Architectural Rules)
 
 | # | Pattern Type | Category | Detection Strategy & Clojure Idioms |
 |---|---|---|---|
-| 1 | **Observer** | Behavioral | Watched state containers (`atom`/`ref`/`agent`), `add-watch` calls, 4-parameter callbacks `[key ref old-state new-state]`. |
-| 2 | **Strategy** | Behavioral | `defmulti` dispatch function + multiple `defmethod` branches, or `defprotocol` with 2+ implementing records. |
-| 3 | **Decorator / Middleware** | Structural | Ring-style middleware: functions taking `[handler]` and returning inner closure `(fn [req] ...)`, function composition via `comp`. |
-| 4 | **Chain of Responsibility** | Behavioral | Pipeline assembly chaining middleware processing stages using `->`, `->>`, or `comp`. |
-| 5 | **Template Method** | Behavioral | Resource bracket macros/functions (`with-*`, `with-open`, `with-tx`) with `try/catch/finally` acquire/release safety. |
-| 6 | **Command / CQRS** | Behavioral | Message-driven command dispatch on `:type`/`:command`/`:op` discriminant keys, executable command records. |
-| 7 | **State / FSM** | Behavioral | Finite state machine transition multimethods and pure transition functions on `[current-state event]`. |
-| 8 | **Singleton** | Creational | `defonce` with mutable reference container (`atom`, `ref`, `agent`) or memoized lazy delay instance. |
-| 9 | **Factory Method** | Creational | Constructor helpers (`make-*`, `create-*`, `build-*`, `new-*`) encapsulating `->Record` or `map->Record`. |
-| 10 | **Abstract Factory** | Creational | Protocols declaring families of creation methods (`create-blob-storage`, `create-queue`) implemented by concrete factory records. |
-| 11 | **Builder** | Creational | Fluent configuration step functions (`with-*`, `set-*`) modifying and returning accumulator maps/records. |
-| 12 | **Adapter** | Structural | External protocol extensions (`extend-type`/`extend-protocol`) adapting host/Java types without source modification. |
-| 13 | **Facade** | Structural | High-level API/gateway namespaces aggregating and delegating calls across multiple internal subsystems. |
-| 14 | **Proxy** | Structural | Dynamic host interop proxies `(proxy [Class] ...)` and deferred access proxies via `delay`/`future`. |
-| 15 | **Flyweight** | Structural | Shared immutable instances and result caches via `memoize` or interning tables. |
-| 16 | **Lifecycle Component** | Architectural | Stuart Sierra `Lifecycle` component protocol with explicit `start` and `stop` transitions. |
-| 17 | **Circular Dependency** | Architectural | Graph-based cycle detection identifying mutual dependency loops (`A ➔ B ➔ A`) across namespaces. |
+| 1 | **Singleton** | Creational | `defonce` with mutable reference container (`atom`, `ref`, `agent`) or memoized lazy delay instance. |
+| 2 | **Factory Method** | Creational | Constructor helpers (`make-*`, `create-*`, `build-*`, `new-*`) encapsulating `->Record` or `map->Record`. |
+| 3 | **Abstract Factory** | Creational | Protocols declaring families of creation methods (`create-blob-storage`, `create-queue`) implemented by concrete factory records. |
+| 4 | **Builder** | Creational | Fluent configuration step functions (`with-*`, `set-*`) modifying and returning accumulator maps/records. |
+| 5 | **Prototype** | Creational | Protocols defining `clone`/`copy-with` and helper functions deriving modified variants from prototype templates. |
+| 6 | **Adapter** | Structural | External protocol extensions (`extend-type`/`extend-protocol`) adapting host/Java types without source modification. |
+| 7 | **Decorator / Middleware** | Structural | Ring-style middleware: functions taking `[handler]` and returning inner closure `(fn [req] ...)`, function composition via `comp`. |
+| 8 | **Facade** | Structural | High-level API/gateway namespaces aggregating and delegating calls across multiple internal subsystems. |
+| 9 | **Composite** | Structural | Protocols unifying leaf elements and composite containers holding child element collections in part-whole trees. |
+| 10 | **Bridge** | Structural | Decoupled high-level abstraction records maintaining references to low-level implementation driver protocols. |
+| 11 | **Proxy** | Structural | Dynamic host interop proxies `(proxy [Class] ...)` and deferred access proxies via `delay`/`future`. |
+| 12 | **Flyweight** | Structural | Shared immutable instances and result caches via `memoize` or interning tables. |
+| 13 | **Observer** | Behavioral | Watched state containers (`atom`/`ref`/`agent`), `add-watch` calls, 4-parameter callbacks `[key ref old-state new-state]`. |
+| 14 | **Strategy** | Behavioral | `defmulti` dispatch function + multiple `defmethod` branches, or `defprotocol` with 2+ implementing records. |
+| 15 | **Chain of Responsibility** | Behavioral | Pipeline assembly chaining middleware processing stages using `->`, `->>`, or `comp`. |
+| 16 | **Template Method** | Behavioral | Resource bracket macros/functions (`with-*`, `with-open`, `with-tx`) with `try/catch/finally` acquire/release safety. |
+| 17 | **Command / CQRS** | Behavioral | Message-driven command dispatch on `:type`/`:command`/`:op` discriminant keys, executable command records. |
+| 18 | **State / FSM** | Behavioral | Finite state machine transition multimethods and pure transition functions on `[current-state event]`. |
+| 19 | **Iterator** | Behavioral | Lazy sequence generators with `(lazy-seq ...)`, custom traversal streams, or `Iterator`/`Iterable` protocols. |
+| 20 | **Mediator** | Behavioral | Centralized message broker hubs / event buses (`EventBroker`, `publish`/`subscribe`) decoupling sender/receiver components. |
+| 21 | **Memento** | Behavioral | State capture and rollback functions (`save-snapshot`, `restore-snapshot`, `checkpoint`, `undo`/`redo`). |
+| 22 | **Visitor** | Behavioral | Tree traversal walkers using polymorphic node tag dispatch (`visit-ast`, `walk-node`) and `clojure.walk`. |
+| 23 | **Interpreter** | Behavioral | Domain expression/AST evaluators (`eval-expr`, `evaluate-ast`) recursively interpreting grammar sentence trees. |
+| 24 | **Lifecycle Component** | Architectural | Stuart Sierra `Lifecycle` component protocol with explicit `start` and `stop` transitions. |
+| 25 | **Circular Dependency** | Architectural | Graph-based cycle detection identifying mutual dependency loops (`A ➔ B ➔ A`) across namespaces. |
 
 ---
 

@@ -46,6 +46,7 @@ class PatternType(str, Enum):
     MEDIATOR = "mediator"
     MEMENTO = "memento"
     VISITOR = "visitor"
+    INTERPRETER = "interpreter"
 
     # Idiomatic & Functional Architecture
     LIFECYCLE_COMPONENT = "lifecycle_component"

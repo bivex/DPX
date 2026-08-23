@@ -64,6 +64,14 @@ PATTERN_TYPE_COLORS: dict[PatternType, dict[str, str]] = {
     PatternType.FLYWEIGHT: {"text": "#5eead4", "bg": "#134e4a44", "border": "#14b8a6"},
     PatternType.LIFECYCLE_COMPONENT: {"text": "#fcd34d", "bg": "#78350f44", "border": "#d97706"},
     PatternType.CIRCULAR_DEPENDENCY: {"text": "#f87171", "bg": "#7f1d1d44", "border": "#dc2626"},
+    PatternType.PROTOTYPE: {"text": "#86efac", "bg": "#14532d44", "border": "#22c55e"},
+    PatternType.COMPOSITE: {"text": "#38bdf8", "bg": "#0c4a6e44", "border": "#0284c7"},
+    PatternType.BRIDGE: {"text": "#67e8f9", "bg": "#164e6344", "border": "#0891b2"},
+    PatternType.ITERATOR: {"text": "#a78bfa", "bg": "#4c1d9544", "border": "#7c3aed"},
+    PatternType.MEDIATOR: {"text": "#fb923c", "bg": "#7c2d1244", "border": "#ea580c"},
+    PatternType.MEMENTO: {"text": "#e879f9", "bg": "#701a7544", "border": "#c026d3"},
+    PatternType.VISITOR: {"text": "#f472b6", "bg": "#83184344", "border": "#db2777"},
+    PatternType.INTERPRETER: {"text": "#60a5fa", "bg": "#1e3a8a44", "border": "#2563eb"},
 }
 
 
